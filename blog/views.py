@@ -1,46 +1,46 @@
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
+from django.urls import reverse
 from .models import Answer
 from django.views.generic import (
     ListView,
     DetailView,
     CreateView,
     UpdateView,
-    DeleteView
+    DeleteView,
 )
 from .models import Post, Answer
 
 
 def home(request):
-    context = {
-        'posts': Post.objects.all()
-    }
-    return render(request, 'blog/home.html', context)
+    context = {"posts": Post.objects.all()}
+    return render(request, "blog/home.html", context)
 
 
 class PostListView(ListView):
     model = Post
-    template_name = 'blog/home.html'  # <app>/<model>_<viewtype>.html
-    context_object_name = 'posts'
-    ordering = ['-date_posted']
+    template_name = "blog/home.html"  # <app>/<model>_<viewtype>.html
+    context_object_name = "posts"
+    ordering = ["-date_posted"]
     paginate_by = 5
 
 
 class UserPostListView(ListView):
     model = Post
-    template_name = 'blog/user_posts.html'  # <app>/<model>_<viewtype>.html
-    context_object_name = 'posts'
+    template_name = "blog/user_posts.html"  # <app>/<model>_<viewtype>.html
+    context_object_name = "posts"
     paginate_by = 5
 
     def get_queryset(self):
-        user = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Post.objects.filter(author=user).order_by('-date_posted')
+        user = get_object_or_404(User, username=self.kwargs.get("username"))
+        return Post.objects.filter(author=user).order_by("-date_posted")
 
 
 class PostDetailView(DetailView):
     model = Post
-    fields = ['answers']
+    fields = ["answers"]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -51,7 +51,7 @@ class PostDetailView(DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ['title', 'content']
+    fields = ["title", "content"]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -60,7 +60,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['title', 'content']
+    fields = ["title", "content"]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -75,7 +75,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
-    success_url = '/'
+    success_url = "/"
 
     def test_func(self):
         post = self.get_object()
@@ -83,25 +83,29 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         return False
 
+
 # class AddAnswerView(LoginRequiredMixin, CreateView):
 #     model = Answer
 #     template_name = "blog/add_answers.html"
 #     fields = '__all__'
 
+
 def AddAnswerView(request, pk):
-    if request.method == 'POST':
-        answer = request.POST.get('answer')
-        print(request)
+    print(request)
+    if request.method == "POST":
+        answer = request.POST.get("answer")
+        Answer.objects.create(
+            post=Post.objects.get(pk=pk),
+            answer_text=answer,
+            posted_by=request.user,
+        )
+        return HttpResponseRedirect(reverse("post-detail", args=(pk,)))
     else:
-        return render(request, 'blog/add_answers.html')    
-    return True
-
-# def AddAnswerSubmit(request, post_id):
-#     if request.method == 'POST':
-#         answer = request.POST.get('answer')
-#         return True if answer else False
-
+        if request.user.is_authenticated:
+            return render(request, "blog/add_answers.html", {"pk": pk})
+        else:
+            return HttpResponseRedirect(reverse("login"))
 
 
 def about(request):
-    return render(request, 'blog/about.html', {'title': 'About'})
+    return render(request, "blog/about.html", {"title": "About"})
