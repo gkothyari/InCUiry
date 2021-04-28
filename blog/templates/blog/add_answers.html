@@ -1,0 +1,13 @@
+{% extends "blog/base.html" %}
+<!-- {% load crispy_forms_tags %} -->
+{% block content %}
+    <div class="content-section">
+        <form method="POST" action="{% url 'add_answer'  %}">
+            {% csrf_token %}
+            <textarea name="answer" id="" cols="30" rows="5"></textarea>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

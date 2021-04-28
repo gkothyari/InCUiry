@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
+from .models import Answer
 from django.views.generic import (
     ListView,
     DetailView,
@@ -81,6 +82,25 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user == post.author:
             return True
         return False
+
+# class AddAnswerView(LoginRequiredMixin, CreateView):
+#     model = Answer
+#     template_name = "blog/add_answers.html"
+#     fields = '__all__'
+
+def AddAnswerView(request, pk):
+    if request.method == 'POST':
+        answer = request.POST.get('answer')
+        print(request)
+    else:
+        return render(request, 'blog/add_answers.html')    
+    return True
+
+# def AddAnswerSubmit(request, post_id):
+#     if request.method == 'POST':
+#         answer = request.POST.get('answer')
+#         return True if answer else False
+
 
 
 def about(request):

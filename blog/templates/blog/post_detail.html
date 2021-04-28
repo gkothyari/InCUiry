@@ -15,11 +15,29 @@
       </div>
       <h2 class="article-title">{{ object.title }}</h2>
       <p class="article-content">{{ object.content }}</p>
+      <h2>Answers:</h2>
+      <hr>
       <div>
-      {% for answer in object.answers.all %}
-        <h3> {{ answer.posted_by }} </h3>
-        <span> {{answer}} </span>
-      {% endfor %}
+      {% if not post.answers.all %}
+        No comments Yet...<a href="{% url 'add_answer' post.pk%}">
+          Add one
+        </a>
+      {% else %}
+      <a href="{% url 'add_answer' post.pk%}">
+        Add one
+      </a>
+      <br><br>
+        {% for answer in post.answers.all %}
+          <strong>
+           {{ answer.posted_by }}
+           {{ answer.date_posted }}
+          </strong>
+          <br>
+           {{answer}}
+           <br/>
+           <hr>
+        {% endfor %}
+      {% endif %}  
       </div>
     </div>
   </article>
