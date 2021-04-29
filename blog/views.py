@@ -91,7 +91,6 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 def AddAnswerView(request, pk):
-    print(request)
     if request.method == "POST":
         answer = request.POST.get("answer")
         Answer.objects.create(
