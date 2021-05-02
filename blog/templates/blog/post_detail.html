@@ -1,6 +1,6 @@
 {% extends "blog/base.html" %}
 {% block content %}
-  <article class="media content-section">
+  <article class="media content-section" style="background-color: whitesmoke" >
     <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
     <div class="media-body">
       <div class="article-metadata">
@@ -29,10 +29,9 @@
       <br><br>
         {% for answer in post.answers.all %}
           <strong>
-           {{ answer.posted_by }}
-           {{ answer.date_posted }}
+          <h5> {{ answer.posted_by }} </h5>
+           <h6> {{ answer.date_posted }} </h6>
           </strong>
-          <br>
            {{answer}}
            <br/>
            <hr>
